@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Properties;
 
@@ -35,14 +36,25 @@ public class MySQL {
         }
     }
     
-    public static ResultSet executeSearch(String query) throws Exception {
+    public static ResultSet executeSearch(String query, Object... parameters) throws Exception {
         createConnection();
-        return connection.createStatement().executeQuery(query);
+        PreparedStatement statement = connection.prepareStatement(query);
+        setParameters(statement, parameters);
+        return statement.executeQuery();
     }
     
-    public static Integer executeIUD(String query) throws Exception {
+    public static Integer executeIUD(String query, Object... parameters) throws Exception {
         createConnection();
-        return connection.createStatement().executeUpdate(query);
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            setParameters(statement, parameters);
+            return statement.executeUpdate();
+        }
+    }
+
+    private static void setParameters(PreparedStatement statement, Object... parameters) throws Exception {
+        for (int i = 0; i < parameters.length; i++) {
+            statement.setObject(i + 1, parameters[i]);
+        }
     }
 
     private static Properties loadDatabaseProperties() throws IOException {

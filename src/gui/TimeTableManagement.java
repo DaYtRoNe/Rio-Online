@@ -101,10 +101,10 @@ public class TimeTableManagement extends javax.swing.JFrame {
                     + "FROM grade_has_subject ghs "
                     + "JOIN grade g ON ghs.grade_id = g.id "
                     + "JOIN subject s ON ghs.subject_id = s.id "
-                    + "WHERE ghs.day_id = " + dayId + " "
+                    + "WHERE ghs.day_id = ? "
                     + "ORDER BY g.priority ASC, s.name ASC";
 
-            ResultSet rs = MySQL.executeSearch(query);
+            ResultSet rs = MySQL.executeSearch(query, dayId);
 
             while (rs.next()) {
                 Vector<Object> v = new Vector<>();
@@ -401,13 +401,13 @@ public class TimeTableManagement extends javax.swing.JFrame {
             Integer subjectId = subjectMap.get(subject);
 
             // Check for duplicates
-            String checkQuery = "SELECT * FROM `grade_has_subject` WHERE `grade_id`=" + gradeId + " AND `subject_id`=" + subjectId + " AND `day_id`=" + dayId;
-            ResultSet rs = MySQL.executeSearch(checkQuery);
+            String checkQuery = "SELECT * FROM `grade_has_subject` WHERE `grade_id`=? AND `subject_id`=? AND `day_id`=?";
+            ResultSet rs = MySQL.executeSearch(checkQuery, gradeId, subjectId, dayId);
             if (rs.next()) {
                 JOptionPane.showMessageDialog(this, "This entry already exists for the selected day.", "Duplicate Entry", JOptionPane.WARNING_MESSAGE);
             } else {
-                String insertQuery = "INSERT INTO `grade_has_subject`(`grade_id`, `day_id`, `subject_id`) VALUES(" + gradeId + ", " + dayId + ", " + subjectId + ")";
-                MySQL.executeIUD(insertQuery);
+                String insertQuery = "INSERT INTO `grade_has_subject`(`grade_id`, `day_id`, `subject_id`) VALUES(?, ?, ?)";
+                MySQL.executeIUD(insertQuery, gradeId, dayId, subjectId);
                 loadTimeTable();
                 clearFields();
                 JOptionPane.showMessageDialog(this, "Timetable entry added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
@@ -441,13 +441,13 @@ public class TimeTableManagement extends javax.swing.JFrame {
             Integer subjectId = subjectMap.get(subject);
 
             // Check for duplicates before updating
-            String checkQuery = "SELECT * FROM `grade_has_subject` WHERE `grade_id`=" + gradeId + " AND `subject_id`=" + subjectId + " AND `day_id`=" + dayId + " AND `id`!=" + id;
-            ResultSet rs = MySQL.executeSearch(checkQuery);
+            String checkQuery = "SELECT * FROM `grade_has_subject` WHERE `grade_id`=? AND `subject_id`=? AND `day_id`=? AND `id`!=?";
+            ResultSet rs = MySQL.executeSearch(checkQuery, gradeId, subjectId, dayId, id);
             if (rs.next()) {
                 JOptionPane.showMessageDialog(this, "This combination already exists in the timetable.", "Duplicate Entry", JOptionPane.WARNING_MESSAGE);
             } else {
-                String updateQuery = "UPDATE `grade_has_subject` SET `grade_id`=" + gradeId + ", `subject_id`=" + subjectId + " WHERE `id`=" + id;
-                MySQL.executeIUD(updateQuery);
+                String updateQuery = "UPDATE `grade_has_subject` SET `grade_id`=?, `subject_id`=? WHERE `id`=?";
+                MySQL.executeIUD(updateQuery, gradeId, subjectId, id);
                 loadTimeTable();
                 clearFields();
                 JOptionPane.showMessageDialog(this, "Timetable entry updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
@@ -469,7 +469,7 @@ public class TimeTableManagement extends javax.swing.JFrame {
 
         if (confirm == JOptionPane.YES_OPTION) {
             try {
-                MySQL.executeIUD("DELETE FROM `grade_has_subject` WHERE `id`=" + id);
+                MySQL.executeIUD("DELETE FROM `grade_has_subject` WHERE `id`=?", id);
                 loadTimeTable();
                 clearFields();
                 JOptionPane.showMessageDialog(this, "Timetable entry deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);

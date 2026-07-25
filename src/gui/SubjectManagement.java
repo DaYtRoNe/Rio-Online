@@ -256,11 +256,11 @@ public class SubjectManagement extends javax.swing.JFrame {
         }
         try {
             // Check if subject already exists
-            ResultSet rs = MySQL.executeSearch("SELECT * FROM `subject` WHERE `name`='" + name + "'");
+            ResultSet rs = MySQL.executeSearch("SELECT * FROM `subject` WHERE `name`=?", name);
             if (rs.next()) {
                 JOptionPane.showMessageDialog(this, "This subject already exists.", "Warning", JOptionPane.WARNING_MESSAGE);
             } else {
-                MySQL.executeIUD("INSERT INTO subject(name) VALUES('" + name + "')");
+                MySQL.executeIUD("INSERT INTO subject(name) VALUES(?)", name);
                 loadSubjects();
                 clearFields();
                 JOptionPane.showMessageDialog(this, "Subject added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
@@ -294,11 +294,11 @@ public class SubjectManagement extends javax.swing.JFrame {
 
         try {
             // Check if new subject name already exists
-            ResultSet rs = MySQL.executeSearch("SELECT * FROM `subject` WHERE `name`='" + name + "' AND `id`!='" + id + "'");
+            ResultSet rs = MySQL.executeSearch("SELECT * FROM `subject` WHERE `name`=? AND `id`!=?", name, id);
             if (rs.next()) {
                 JOptionPane.showMessageDialog(this, "This subject already exists.", "Warning", JOptionPane.WARNING_MESSAGE);
             } else {
-                MySQL.executeIUD("UPDATE `subject` SET `name`='" + name + "' WHERE `id`='" + id + "'");
+                MySQL.executeIUD("UPDATE `subject` SET `name`=? WHERE `id`=?", name, id);
                 loadSubjects();
                 clearFields();
                 JOptionPane.showMessageDialog(this, "Subject updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
@@ -323,8 +323,8 @@ public class SubjectManagement extends javax.swing.JFrame {
             try {
                 // Because of the foreign key constraint, we must first delete the records 
                 // from the child table (grade_has_subject).
-                MySQL.executeIUD("DELETE FROM `grade_has_subject` WHERE `subject_id`='" + id + "'");
-                MySQL.executeIUD("DELETE FROM `subject` WHERE `id`='" + id + "'");
+                MySQL.executeIUD("DELETE FROM `grade_has_subject` WHERE `subject_id`=?", id);
+                MySQL.executeIUD("DELETE FROM `subject` WHERE `id`=?", id);
 
                 loadSubjects();
                 clearFields();

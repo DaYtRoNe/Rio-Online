@@ -276,20 +276,20 @@ public class GradeManagement extends javax.swing.JFrame {
         }
         try {
             // Check if grade name already exists
-            ResultSet rsName = MySQL.executeSearch("SELECT * FROM `grade` WHERE `name`='" + name + "'");
+            ResultSet rsName = MySQL.executeSearch("SELECT * FROM `grade` WHERE `name`=?", name);
             if (rsName.next()) {
                 JOptionPane.showMessageDialog(this, "This grade name already exists.", "Warning", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
             // Check if priority already exists
-            ResultSet rsPriority = MySQL.executeSearch("SELECT * FROM `grade` WHERE `priority`='" + priority + "'");
+            ResultSet rsPriority = MySQL.executeSearch("SELECT * FROM `grade` WHERE `priority`=?", priority);
             if (rsPriority.next()) {
                 JOptionPane.showMessageDialog(this, "This priority is already assigned to another grade.", "Warning", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
-            MySQL.executeIUD("INSERT INTO `grade`(`name`, `priority`) VALUES('" + name + "', " + priority + ")");
+            MySQL.executeIUD("INSERT INTO `grade`(`name`, `priority`) VALUES(?, ?)", name, priority);
             loadGrades();
             clearFields();
             JOptionPane.showMessageDialog(this, "Grade added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
@@ -317,20 +317,20 @@ public class GradeManagement extends javax.swing.JFrame {
 
         try {
             // Check if another grade has the same name
-            ResultSet rsName = MySQL.executeSearch("SELECT * FROM `grade` WHERE `name`='" + name + "' AND `id`!='" + id + "'");
+            ResultSet rsName = MySQL.executeSearch("SELECT * FROM `grade` WHERE `name`=? AND `id`!=?", name, id);
             if (rsName.next()) {
                 JOptionPane.showMessageDialog(this, "This grade name already exists.", "Warning", JOptionPane.WARNING_MESSAGE);
                 return;
             }
             
             // Check if another grade has the same priority
-             ResultSet rsPriority = MySQL.executeSearch("SELECT * FROM `grade` WHERE `priority`='" + priority + "' AND `id`!='" + id + "'");
+             ResultSet rsPriority = MySQL.executeSearch("SELECT * FROM `grade` WHERE `priority`=? AND `id`!=?", priority, id);
             if(rsPriority.next()){
                  JOptionPane.showMessageDialog(this, "This priority is already assigned to another grade.", "Warning", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
-            MySQL.executeIUD("UPDATE `grade` SET `name`='" + name + "', `priority`=" + priority + " WHERE `id`='" + id + "'");
+            MySQL.executeIUD("UPDATE `grade` SET `name`=?, `priority`=? WHERE `id`=?", name, priority, id);
             loadGrades();
             clearFields();
             JOptionPane.showMessageDialog(this, "Grade updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
@@ -352,8 +352,8 @@ public class GradeManagement extends javax.swing.JFrame {
 
         if (confirm == JOptionPane.YES_OPTION) {
             try {
-                MySQL.executeIUD("DELETE FROM `grade_has_subject` WHERE `grade_id`='" + id + "'");
-                MySQL.executeIUD("DELETE FROM `grade` WHERE `id`='" + id + "'");
+                MySQL.executeIUD("DELETE FROM `grade_has_subject` WHERE `grade_id`=?", id);
+                MySQL.executeIUD("DELETE FROM `grade` WHERE `id`=?", id);
                 loadGrades();
                 clearFields();
                 JOptionPane.showMessageDialog(this, "Grade deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);

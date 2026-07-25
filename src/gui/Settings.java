@@ -257,11 +257,11 @@ public class Settings extends javax.swing.JFrame {
         }
         try {
             // Check if content already exists
-            ResultSet rs = MySQL.executeSearch("SELECT * FROM `settings` WHERE `content`='" + content + "'");
+            ResultSet rs = MySQL.executeSearch("SELECT * FROM `settings` WHERE `content`=?", content);
             if (rs.next()) {
                 JOptionPane.showMessageDialog(this, "This content already exists.", "Warning", JOptionPane.WARNING_MESSAGE);
             } else {
-                MySQL.executeIUD("INSERT INTO `settings`(`content`) VALUES('" + content + "')");
+                MySQL.executeIUD("INSERT INTO `settings`(`content`) VALUES(?)", content);
                 loadSettings();
                 clearFields();
                 JOptionPane.showMessageDialog(this, "Content added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
@@ -294,11 +294,11 @@ public class Settings extends javax.swing.JFrame {
 
         try {
             // Check if new content already exists
-            ResultSet rs = MySQL.executeSearch("SELECT * FROM `settings` WHERE `content`='" + content + "' AND `id`!='" + id + "'");
+            ResultSet rs = MySQL.executeSearch("SELECT * FROM `settings` WHERE `content`=? AND `id`!=?", content, id);
             if (rs.next()) {
                 JOptionPane.showMessageDialog(this, "This content already exists.", "Warning", JOptionPane.WARNING_MESSAGE);
             } else {
-                MySQL.executeIUD("UPDATE `settings` SET `content`='" + content + "' WHERE `id`='" + id + "'");
+                MySQL.executeIUD("UPDATE `settings` SET `content`=? WHERE `id`=?", content, id);
                 loadSettings();
                 clearFields();
                 JOptionPane.showMessageDialog(this, "Content updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
@@ -320,7 +320,7 @@ public class Settings extends javax.swing.JFrame {
 
         if (confirm == JOptionPane.YES_OPTION) {
             try {
-                MySQL.executeIUD("DELETE FROM `settings` WHERE `id`='" + id + "'");
+                MySQL.executeIUD("DELETE FROM `settings` WHERE `id`=?", id);
                 loadSettings();
                 clearFields();
                 JOptionPane.showMessageDialog(this, "Content deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);

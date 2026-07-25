@@ -16,3 +16,8 @@ You can also override database settings with system properties or environment va
 - `db.url` / `DB_URL`
 - `db.username` / `DB_USERNAME`
 - `db.password` / `DB_PASSWORD`
+## Usage
+
+- Use `Previous`, `Current`, and `Next` to move through timetable dates.
+- Click the date at the top of the main window to choose a specific date.
+- Use row `Copy` buttons, double-click rows, or the saved-content dropdown to copy text to the clipboard.

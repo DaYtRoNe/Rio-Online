@@ -3,6 +3,7 @@ package gui;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -10,13 +11,17 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.sql.ResultSet;
 import java.time.format.TextStyle;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Vector;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JOptionPane;
+import javax.swing.JSpinner;
 import javax.swing.JTable;
+import javax.swing.SpinnerDateModel;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
@@ -36,6 +41,7 @@ public class Main extends javax.swing.JFrame {
     public Main() {
         initComponents();
         this.setMinimumSize(new Dimension(500, 521));
+        configureDatePicker();
         clock();
         loadSubjects();
         loadContent();
@@ -50,21 +56,50 @@ public class Main extends javax.swing.JFrame {
     }
 
     private void adjustDaysOffset(int delta) {
-        daysOffset += delta;
-        displayedDate = java.time.LocalDate.now().plusDays(daysOffset);
+        setDisplayedDate(displayedDate.plusDays(delta));
+    }
+
+    private void setDisplayedDate(java.time.LocalDate date) {
+        displayedDate = date;
+        daysOffset = (int) java.time.temporal.ChronoUnit.DAYS.between(java.time.LocalDate.now(), displayedDate);
         updateDateAndDay();
         loadSubjects();
+    }
+
+    private void configureDatePicker() {
+        dateField.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        dateField.setToolTipText("Click to choose a date");
+        dateField.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                openDatePicker();
+            }
+        });
+    }
+
+    private void openDatePicker() {
+        Date selectedDate = Date.from(displayedDate.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant());
+        SpinnerDateModel dateModel = new SpinnerDateModel(selectedDate, null, null, java.util.Calendar.DAY_OF_MONTH);
+        JSpinner dateSpinner = new JSpinner(dateModel);
+        dateSpinner.setEditor(new JSpinner.DateEditor(dateSpinner, "yyyy-MM-dd"));
+
+        int option = JOptionPane.showConfirmDialog(this, dateSpinner, "Select Date", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (option == JOptionPane.OK_OPTION) {
+            Date date = (Date) dateSpinner.getValue();
+            setDisplayedDate(date.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate());
+        }
     }
 
     private void loadSubjects() {
         try {
             String dayOfWeek = displayedDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
             ResultSet rs = MySQL.executeSearch(
-                    "SELECT grade.name, subject.name, day.name FROM grade_has_subject "
+                    "SELECT grade.name AS grade_name, subject.name AS subject_name FROM grade_has_subject "
                     + "JOIN grade ON grade_has_subject.grade_id = grade.id "
                     + "JOIN subject ON grade_has_subject.subject_id = subject.id "
                     + "JOIN day ON grade_has_subject.day_id = day.id "
-                    + "WHERE day.name = '" + dayOfWeek + "' ORDER BY `grade`.`priority` ASC, `subject`.`name` ASC"
+                    + "WHERE day.name = ? ORDER BY `grade`.`priority` ASC, `subject`.`name` ASC",
+                    dayOfWeek
             );
 
             DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
@@ -96,7 +131,7 @@ public class Main extends javax.swing.JFrame {
                 vector.add(rs.getString("content"));
             }
 
-            DefaultComboBoxModel model = new DefaultComboBoxModel(vector);
+            DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>(vector);
             jComboBox1.setModel(model);
 
         } catch (Exception e) {
