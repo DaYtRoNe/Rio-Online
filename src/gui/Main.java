@@ -107,8 +107,8 @@ public class Main extends javax.swing.JFrame {
 
             while (rs.next()) {
                 Vector<String> vector = new Vector<>();
-                String grade = rs.getString("grade.name");
-                String subject = rs.getString("subject.name");
+                String grade = rs.getString("grade_name");
+                String subject = rs.getString("subject_name");
                 vector.add(grade + " - " + subject + " (" + displayedDate.format(dateFormatter) + ")");
                 vector.add("Copy");
                 model.addRow(vector);
