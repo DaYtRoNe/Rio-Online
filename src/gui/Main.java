@@ -575,8 +575,7 @@ public class Main extends javax.swing.JFrame {
     }//GEN-LAST:event_previousButtonActionPerformed
 
     private void currentButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_currentButtonActionPerformed
-        daysOffset = 0;
-        adjustDaysOffset(0);
+        setDisplayedDate(java.time.LocalDate.now());
     }//GEN-LAST:event_currentButtonActionPerformed
 
     private void nextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextButtonActionPerformed
