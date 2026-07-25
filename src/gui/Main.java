@@ -1,8 +1,8 @@
 package gui;
 
-import com.formdev.flatlaf.themes.FlatMacDarkLaf;
-import com.formdev.flatlaf.themes.FlatMacLightLaf;
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.Cursor;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -14,11 +14,15 @@ import java.time.format.TextStyle;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Vector;
+import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.SpinnerDateModel;
@@ -37,10 +41,14 @@ public class Main extends javax.swing.JFrame {
     private int daysOffset = 0;
     // Format the date as yyyy-MM-dd
     java.time.format.DateTimeFormatter dateFormatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private JButton themeToggleButton;
 
     public Main() {
         initComponents();
-        this.setMinimumSize(new Dimension(500, 521));
+        configureThemeToggle();
+        configureMainDashboard();
+        UITheme.applyDashboardFrame(this, roundedPanel1, roundedPanel2, roundedPanel3, jTable1);
+        this.setMinimumSize(new Dimension(760, 520));
         configureDatePicker();
         clock();
         loadSubjects();
@@ -48,6 +56,117 @@ public class Main extends javax.swing.JFrame {
         updateDateAndDay(); // Initialize date and day display
     }
 
+
+    private void configureThemeToggle() {
+        themeToggleButton = new JButton(UITheme.getToggleButtonText());
+        themeToggleButton.setToolTipText("Switch between dark and light theme");
+        themeToggleButton.addActionListener(event -> {
+            UITheme.toggleTheme();
+            themeToggleButton.setText(UITheme.getToggleButtonText());
+            UITheme.applyDashboardFrame(this, roundedPanel1, roundedPanel2, roundedPanel3, jTable1);
+        });
+
+        dateField.setColumns(10);
+
+        JPanel statusPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
+        statusPanel.setOpaque(false);
+        statusPanel.add(dateField);
+        statusPanel.add(jLabel2);
+        statusPanel.add(timeLabel);
+        statusPanel.add(themeToggleButton);
+
+        roundedPanel2.removeAll();
+        roundedPanel2.setLayout(new BorderLayout(16, 0));
+        roundedPanel2.setBorder(BorderFactory.createEmptyBorder(8, 18, 8, 12));
+        roundedPanel2.add(jLabel1, BorderLayout.WEST);
+        roundedPanel2.add(statusPanel, BorderLayout.EAST);
+        roundedPanel2.revalidate();
+        roundedPanel2.repaint();
+    }
+
+
+    private void configureMainDashboard() {
+        timeTableButton.setText("Timetable");
+        gradeButton.setText("Grades");
+        subjectButton.setText("Subjects");
+        settingsButton.setText("Settings");
+        jLabel3.setText("Saved Content");
+
+        configureActionPanel();
+        configureDashboardTable();
+
+        JPanel contentPanel = new JPanel(new BorderLayout(0, 14));
+        contentPanel.setOpaque(false);
+        contentPanel.add(roundedPanel3, BorderLayout.NORTH);
+        contentPanel.add(createSchedulePanel(), BorderLayout.CENTER);
+
+        roundedPanel1.removeAll();
+        roundedPanel1.setLayout(new BorderLayout(0, 14));
+        roundedPanel1.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
+        roundedPanel1.add(roundedPanel2, BorderLayout.NORTH);
+        roundedPanel1.add(contentPanel, BorderLayout.CENTER);
+        roundedPanel1.revalidate();
+        roundedPanel1.repaint();
+    }
+
+    private void configureActionPanel() {
+        JPanel managementPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        managementPanel.setOpaque(false);
+        managementPanel.add(timeTableButton);
+        managementPanel.add(gradeButton);
+        managementPanel.add(subjectButton);
+        managementPanel.add(settingsButton);
+
+        JPanel savedCopyPanel = new JPanel(new BorderLayout(12, 0));
+        savedCopyPanel.setOpaque(false);
+        savedCopyPanel.add(jLabel3, BorderLayout.WEST);
+        savedCopyPanel.add(jComboBox1, BorderLayout.CENTER);
+        savedCopyPanel.add(nextButton1, BorderLayout.EAST);
+
+        roundedPanel3.removeAll();
+        roundedPanel3.setLayout(new BorderLayout(0, 14));
+        roundedPanel3.setBorder(BorderFactory.createEmptyBorder(16, 18, 16, 18));
+        roundedPanel3.add(managementPanel, BorderLayout.NORTH);
+        roundedPanel3.add(savedCopyPanel, BorderLayout.CENTER);
+        roundedPanel3.revalidate();
+        roundedPanel3.repaint();
+    }
+
+    private JPanel createSchedulePanel() {
+        JPanel schedulePanel = new JPanel(new BorderLayout(0, 10));
+        schedulePanel.setOpaque(false);
+
+        JLabel scheduleTitle = new JLabel("Scheduled Classes");
+        scheduleTitle.setFont(UITheme.HEADING_FONT);
+
+        JPanel navigationPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        navigationPanel.setOpaque(false);
+        navigationPanel.add(previousButton);
+        navigationPanel.add(currentButton);
+        navigationPanel.add(nextButton);
+
+        JPanel tableHeaderPanel = new JPanel(new BorderLayout(12, 0));
+        tableHeaderPanel.setOpaque(false);
+        tableHeaderPanel.add(scheduleTitle, BorderLayout.WEST);
+        tableHeaderPanel.add(navigationPanel, BorderLayout.EAST);
+
+        schedulePanel.add(tableHeaderPanel, BorderLayout.NORTH);
+        schedulePanel.add(jScrollPane1, BorderLayout.CENTER);
+        return schedulePanel;
+    }
+
+    private void configureDashboardTable() {
+        jTable1.setColumnSelectionAllowed(false);
+        jTable1.setRowSelectionAllowed(true);
+        jTable1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        jTable1.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+        if (jTable1.getColumnModel().getColumnCount() > 1) {
+            jTable1.getColumnModel().getColumn(0).setPreferredWidth(640);
+            jTable1.getColumnModel().getColumn(1).setMinWidth(96);
+            jTable1.getColumnModel().getColumn(1).setPreferredWidth(110);
+            jTable1.getColumnModel().getColumn(1).setMaxWidth(130);
+        }
+    }
     private void updateDateAndDay() {
         String formattedDate = displayedDate.format(dateFormatter);
         String dayOfWeek = displayedDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
@@ -199,7 +318,7 @@ public class Main extends javax.swing.JFrame {
     class StatusButtonRenderer extends JButton implements TableCellRenderer {
 
         public StatusButtonRenderer() {
-            setOpaque(true);
+            UITheme.styleActionButton(this);
         }
 
         @Override
@@ -208,10 +327,10 @@ public class Main extends javax.swing.JFrame {
             setText(status);
 
             if ("Active".equals(status)) {
-                setBackground(Color.GREEN);
+                setBackground(UITheme.SUCCESS);
                 setForeground(Color.BLACK);
             } else {
-                setBackground(new Color(74, 105, 132));
+                setBackground(UITheme.PRIMARY);
 //                setBackground(new Color(74, 108, 74));
                 setForeground(Color.WHITE);
             }
@@ -231,7 +350,7 @@ public class Main extends javax.swing.JFrame {
         public StatusButtonEditor(JCheckBox checkBox) {
             super(checkBox);
             button = new JButton();
-            button.setOpaque(true);
+            UITheme.styleActionButton(button);
             button.addActionListener(e -> toggleStatus());
         }
 
@@ -242,10 +361,10 @@ public class Main extends javax.swing.JFrame {
 
             button.setText(currentStatus);
             if ("Active".equals(currentStatus)) {
-                button.setBackground(Color.GREEN);
+                button.setBackground(UITheme.SUCCESS);
                 button.setForeground(Color.BLACK);
             } else {
-                setBackground(new Color(74, 105, 132));
+                button.setBackground(UITheme.PRIMARY);
                 button.setForeground(Color.WHITE);
             }
 
@@ -417,7 +536,7 @@ public class Main extends javax.swing.JFrame {
         });
 
         subjectButton.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
-        subjectButton.setText("subject Management");
+        subjectButton.setText("Subject Management");
         subjectButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 subjectButtonActionPerformed(evt);
@@ -425,7 +544,7 @@ public class Main extends javax.swing.JFrame {
         });
 
         settingsButton.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
-        settingsButton.setText("settings Management");
+        settingsButton.setText("Settings Management");
         settingsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 settingsButtonActionPerformed(evt);
@@ -621,7 +740,7 @@ public class Main extends javax.swing.JFrame {
      */
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
-        FlatMacDarkLaf.setup();
+        UITheme.setupLookAndFeel();
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {

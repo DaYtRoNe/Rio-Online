@@ -1,6 +1,5 @@
 package gui;
 
-import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import java.util.Vector;
 import javax.swing.table.DefaultTableModel;
 import model.MySQL;
@@ -20,6 +19,7 @@ public class Settings extends javax.swing.JFrame {
      */
     public Settings() {
         initComponents();
+        UITheme.applyManagementFrame(this, jLabel1, contentTable, jPanel1, jPanel2, jPanel3);
         btnUpdate.setEnabled(false);
         btnDelete.setEnabled(false);
         loadSettings();
@@ -346,7 +346,7 @@ public class Settings extends javax.swing.JFrame {
      */
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
-        FlatMacDarkLaf.setup();
+        UITheme.setupLookAndFeel();
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {

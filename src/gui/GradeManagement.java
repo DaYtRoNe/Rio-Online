@@ -1,6 +1,5 @@
 package gui;
 
-import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import java.util.Vector;
 import javax.swing.table.DefaultTableModel;
 import model.MySQL;
@@ -20,6 +19,7 @@ public class GradeManagement extends javax.swing.JFrame {
      */
     public GradeManagement() {
         initComponents();
+        UITheme.applyManagementFrame(this, jLabel1, gradesTable, jPanel1, jPanel2, jPanel3);
         btnUpdate.setEnabled(false);
         btnDelete.setEnabled(false);
         loadGrades();
@@ -384,7 +384,7 @@ public class GradeManagement extends javax.swing.JFrame {
      */
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
-        FlatMacDarkLaf.setup();
+        UITheme.setupLookAndFeel();
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
