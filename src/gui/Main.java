@@ -17,6 +17,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JTable;
+import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import model.MySQL;
@@ -101,6 +102,34 @@ public class Main extends javax.swing.JFrame {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void copyToClipboard(String text) {
+        StringSelection stringSelection = new StringSelection(text);
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        clipboard.setContents(stringSelection, null);
+    }
+
+    private void showCopyFeedback(JButton button) {
+        String originalText = button.getText();
+        button.setText("Copied");
+        button.setEnabled(false);
+
+        Timer timer = new Timer(900, event -> {
+            button.setText(originalText);
+            button.setEnabled(true);
+        });
+        timer.setRepeats(false);
+        timer.start();
+    }
+
+    private void showWindowCopyFeedback() {
+        String originalTitle = getTitle();
+        setTitle(originalTitle + " - Copied");
+
+        Timer timer = new Timer(900, event -> setTitle(originalTitle));
+        timer.setRepeats(false);
+        timer.start();
     }
 
     private void clock() {
@@ -198,9 +227,8 @@ public class Main extends javax.swing.JFrame {
         private void toggleStatus() {
             int row = jTable1.getSelectedRow();
             String className = String.valueOf(jTable1.getValueAt(row, 0));
-            StringSelection stringSelection = new StringSelection(className);
-            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-            clipboard.setContents(stringSelection, null);
+            copyToClipboard(className);
+            showCopyFeedback(button);
         }
     }
 
@@ -243,7 +271,7 @@ public class Main extends javax.swing.JFrame {
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setText("Rio Onlline School Subject Generator");
+        jLabel1.setText("Rio Online School Subject Generator");
 
         timeLabel.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
         timeLabel.setForeground(new java.awt.Color(255, 255, 255));
@@ -500,11 +528,10 @@ public class Main extends javax.swing.JFrame {
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
         int row = jTable1.getSelectedRow();
-        if (evt.getClickCount() == 2) {
+        if (evt.getClickCount() == 2 && row != -1) {
             String className = String.valueOf(jTable1.getValueAt(row, 0));
-            StringSelection stringSelection = new StringSelection(className);
-            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-            clipboard.setContents(stringSelection, null);
+            copyToClipboard(className);
+            showWindowCopyFeedback();
         }
     }//GEN-LAST:event_jTable1MouseClicked
 
@@ -546,9 +573,8 @@ public class Main extends javax.swing.JFrame {
         String setting = jComboBox1.getSelectedItem().toString();
 
         if (!setting.equals("Select")) {
-            StringSelection stringSelection = new StringSelection(setting);
-            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-            clipboard.setContents(stringSelection, null);
+            copyToClipboard(setting);
+            showCopyFeedback(nextButton1);
         }
     }//GEN-LAST:event_nextButton1ActionPerformed
 

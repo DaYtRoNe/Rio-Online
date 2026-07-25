@@ -4,7 +4,7 @@ Java Swing desktop app for managing Rio Online school links and saved access det
 
 ## Setup
 
-1. Create the MySQL database locally.
+1. Create the MySQL database locally by running `database/schema.sql`.
 2. Copy `config/database.properties.example` to `config/database.properties`.
 3. Update `config/database.properties` with your local database username and password.
 4. Open the project in NetBeans and run it.

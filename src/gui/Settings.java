@@ -334,6 +334,11 @@ public class Settings extends javax.swing.JFrame {
         btnUpdate.setEnabled(true);
         btnDelete.setEnabled(true);
         btnAdd.setEnabled(false);
+        int selectedRow = contentTable.getSelectedRow();
+        if (selectedRow != -1) {
+            String content = String.valueOf(contentTable.getValueAt(selectedRow, 1));
+            contentTextField.setText(content);
+        }
     }//GEN-LAST:event_contentTableMouseClicked
 
     /**
