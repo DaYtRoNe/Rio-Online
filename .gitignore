@@ -1,0 +1,16 @@
+# Build outputs
+/build/
+/dist/
+/store/
+*.class
+
+# Local NetBeans files
+/nbproject/private/
+
+# Local credentials
+/config/database.properties
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+*.log
